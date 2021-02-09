@@ -8,6 +8,7 @@ describe Oystercard do
   end
 
   let(:station) {double :station}
+  let(:station2) {double :station}
 
   it "has a balance of 0" do
     expect(Oystercard.new.balance).to eq(0)
@@ -37,7 +38,7 @@ describe Oystercard do
 
   it "can touch_out" do
     subject.touch_in(station)
-    subject.touch_out
+    subject.touch_out(station)
     expect(subject.in_journey?).to eq(false)
   end
 
@@ -49,7 +50,7 @@ describe Oystercard do
   it "should deduct minimum fare when touch_out is called" do
     min_fare = Oystercard::MINFARE
     subject.touch_in(station)
-    expect {subject.touch_out}.to change {subject.balance}.by(-min_fare)
+    expect {subject.touch_out(station)}.to change {subject.balance}.by(-min_fare)
   end
 
   it "touch_in records entry station" do
@@ -59,8 +60,37 @@ describe Oystercard do
 
   it "touch_out sets entry station to nil" do
     subject.touch_in(station)
-    subject.touch_out
+    subject.touch_out(station)
     expect(subject.entry_station).to eq nil
+  end
+
+  it "touch_out sets exit_station to station" do
+    subject.touch_in(station)
+    subject.touch_out(station)
+    expect(subject.exit_station).to eq station
+  end
+
+  it "touch_in sets exit_station to nil" do
+    subject.touch_in(station)
+    subject.touch_out(station)
+    subject.touch_in(station)
+    expect(subject.exit_station).to eq nil
+  end
+
+  it "touch_in and touch_out creates a journey" do
+    subject.touch_in(station)
+    subject.touch_out(station2)
+    expect(subject.journey).to eq({entry:station, exit:station2})
+  end
+
+  it "updates list of journeys" do
+    subject.touch_in(station)
+    subject.touch_out(station2)
+    expect(subject.journeys.last).to eq subject.journey
+  end
+
+  it "empty list of journeys for new card" do
+    expect(Oystercard.new.journeys).to eq([])
   end
 
 end
