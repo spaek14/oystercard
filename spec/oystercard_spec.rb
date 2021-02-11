@@ -80,13 +80,13 @@ describe Oystercard do
   it "touch_in and touch_out creates a journey" do
     subject.touch_in(station)
     subject.touch_out(station2)
-    expect(subject.journey).to eq({entry:station, exit:station2})
+    expect(subject.journeys[0]).to eq({entry:station, exit:station2})
   end
 
   it "updates list of journeys" do
     subject.touch_in(station)
     subject.touch_out(station2)
-    expect(subject.journeys.last).to eq subject.journey
+    expect(subject.journeys.last).to eq({entry:station, exit:station2})
   end
 
   it "empty list of journeys for new card" do
